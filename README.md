@@ -2,11 +2,11 @@
 
 Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit moderner Formularoberfläche, Empfänger-E-Mail, personalisierter Grußbotschaft, Restguthaben, Admin-Verwaltung und Steuer-neutraler Guthabenanrechnung.
 
-**Version:** 1.5.0 · **Sprache:** Deutsch · **Währung:** EUR · **WordPress:** ab 6.4 · **PHP:** ab 7.4 mit OpenSSL · **WooCommerce:** ab 8.4
+**Version:** 1.6.0 · **Sprache:** Deutsch · **Währung:** EUR · **WordPress:** ab 6.4 · **PHP:** ab 7.4 mit OpenSSL · **WooCommerce:** ab 8.4
 
 ## Installation
 
-1. Die ZIP `alowidat-geschenkgutscheine-v1.5.0.zip` unter **WordPress → Plugins → Plugin hochladen** installieren und aktivieren.
+1. Die ZIP `alowidat-geschenkgutscheine-v1.6.0.zip` unter **WordPress → Plugins → Plugin hochladen** installieren und aktivieren.
 2. WooCommerce muss aktiviert sein; die Shopwährung muss auf **EUR** stehen.
 3. Unter **WooCommerce → Geschenkgutscheine → Einstellungen & Shortcodes** Werte, Mindest-/Höchstbetrag und Farben konfigurieren. Wenn du den Höchstbetrag entfernst und speicherst, steht auf der Gutscheinseite nur „Ab 20 €“.
 4. Eine Seite „Geschenkgutscheine“ erstellen und den Shortcode `[alowidat_gutscheine]` (Elementor-Shortcode-Widget oder WP-Shortcode-Block) einfügen.
@@ -44,6 +44,15 @@ Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit mode
 - Admin: Kennzahlen, Kartensuche, Einzelansicht mit Transaktionen, E-Mail erneut senden, aktivieren/sperren, manuelle Ausgabe, Farben/Preise konfigurieren.
 - HPOS-kompatible WooCommerce-Bestell-API; WooCommerce-Standardfunktionen für Produkte/Bestellungen.
 - Kaufgutscheine: Laufzeit standardmäßig bis zum Ende des dritten Folgekalenderjahrs (§ 195, § 199 BGB), ausgehend vom Ausgabejahr. Individuelle rechtliche Einordnung prüfen.
+
+## Beide Gutscheinfelder verwenden (seit v1.6.0)
+
+- Das **normale WooCommerce-Gutscheinfeld** (im klassischen Warenkorb und Checkout) akzeptiert nun auch gültige Alowidat-Geschenkgutscheine. Dafür werden beide standardmäßigen WooCommerce-Verarbeitungswege unterstützt: Warenkorb-POST (`apply_coupon`) sowie Kassen-AJAX (`wc-ajax=apply_coupon`); bestehende WooCommerce-Rabattcodes bleiben unverändert WooCommerce-Coupons.
+- Geschenkguthaben wird **nicht als gewöhnlicher Rabattcode** behandelt: Weiterhin nach Rabatt- und Steuerberechnung als Guthaben-/Zahlbetragsreduktion, mit unverändertem Bestellguthaben und Restsaldo.
+- **Backend → WooCommerce → Geschenkgutscheine → Einstellungen:** Das zusätzliche Alowidat-Einlösefeld lässt sich ein-/ausblenden. Standardmäßig bleibt die bisherige Anzeige aktiviert. Auch bei ausgeschaltetem Zusatzfeld funktioniert das offizielle WooCommerce-Feld weiterhin für beide Codearten, sofern die WooCommerce-Couponfunktion in WooCommerce → Einstellungen → Allgemein aktiviert ist.
+- Bei aktivem Guthaben erscheint in der Warenkorb-/Checkout-Summe zusätzlich ein **Entfernen-Link** mit Nonce, damit die Karte auch ohne Alowidat-Zusatzfeld wieder gelöst werden kann.
+- `woocommerce`-Checkout-Blöcke und Cart-Blöcke sind **nicht** unterstützt. Die native Coupon-Einlösung gilt für klassische WooCommerce-Formulare, nicht für Store-API-Block-Coupons.
+- Ungültige WooCommerce-Coupons werden weiter vom WooCommerce-Kern geprüft. Das bestehende Plugin-Feld nimmt weiterhin beide Codearten entgegen. Pro Einkauf bleibt eine aktive Alowidat-Geschenkkarte möglich; normale Coupons können soweit von WooCommerce erlaubt gleichzeitig aktiv sein.
 
 ## Rückgabe, Widerruf und Barauszahlung (seit v1.4.0)
 

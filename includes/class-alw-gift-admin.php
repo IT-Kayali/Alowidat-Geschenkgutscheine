@@ -65,6 +65,7 @@ final class ALW_Gift_Admin {
             $old['maximum'] = $max;
             $old['gold'] = sanitize_hex_color( wp_unslash( $_POST['gold'] ?? '' ) ) ?: '#d4b45c';
             $old['dark'] = sanitize_hex_color( wp_unslash( $_POST['dark'] ?? '' ) ) ?: '#212121';
+            $old['auto_redeem_field'] = isset( $_POST['auto_redeem_field'] ) ? 'yes' : 'no';
             update_option( 'alw_gc_settings', $old, false );
             update_option( 'alw_gc_purchase_page_id', absint( $_POST['purchase_page_id'] ?? 0 ), false );
             $redirect = add_query_arg( array( 'tab' => 'settings', 'alw_notice' => 'saved' ), $redirect );
@@ -242,6 +243,8 @@ final class ALW_Gift_Admin {
             <label for="alw-purchase-page">Seite für Geschenkgutscheinkauf</label>
             <?php wp_dropdown_pages( array( 'name' => 'purchase_page_id', 'id' => 'alw-purchase-page', 'selected' => absint( get_option( 'alw_gc_purchase_page_id', 0 ) ), 'show_option_none' => '— Seite auswählen —', 'option_none_value' => '0' ) ); ?>
             <p class="description">Auf dieser Seite muss der Shortcode [alowidat_gutscheine] eingebunden sein. Der Link wird im Kundenkonto verwendet.</p>
+            <p><label for="alw-auto-redeem"><input type="checkbox" id="alw-auto-redeem" name="auto_redeem_field" value="yes" <?php checked( 'yes', $s['auto_redeem_field'] ); ?>> Zusätzliches Alowidat-Gutschein-/Rabattfeld automatisch im Warenkorb und an der Kasse anzeigen</label></p>
+            <p class="description">Deaktivieren: Sofern WooCommerce-Rabattcodes unter WooCommerce → Einstellungen → Allgemein aktiviert sind, bleiben die normalen WooCommerce-Gutscheinfelder sichtbar und akzeptieren weiterhin Alowidat-Geschenkguthaben sowie Rabattcodes. Auch ein angewendeter Geschenkgutschein kann in der Bestellsumme entfernt werden. Der Shortcode [alowidat_gutschein_einloesen] bleibt auf Wunsch manuell nutzbar.</p>
             <p><button class="button button-primary" type="submit">Einstellungen speichern</button></p>
         </form></div>
         <div class="alw-gc-admin-panel"><h2>Shortcodes</h2><p>Erstelle eine WordPress-Seite und füge die folgenden Shortcodes in einen Shortcode-Block oder in Elementor ein.</p>

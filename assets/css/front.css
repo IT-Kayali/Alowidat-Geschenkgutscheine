@@ -95,3 +95,5 @@
 .alw-gc-applied-code button{flex:0 0 auto;padding:5px 8px!important;min-height:32px!important;border:0!important;background:transparent!important;color:var(--alw-ink)!important;font-size:12px!important;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .alw-gc-applied-code button:focus-visible{outline:2px solid var(--alw-gold);outline-offset:2px}
 @media(max-width:650px){.alw-gc-redeem .alw-gc-redeem-tools{width:100%;min-width:0}.alw-gc-applied-code{flex-wrap:wrap}}
+/* 1.6.0: Guthaben im offiziellen WooCommerce-Summenbereich entfernen. */
+.alw-gc-credit-row .alw-gc-remove-credit{font-weight:500;font-size:12px;margin-left:9px;text-decoration:underline;color:var(--alw-gc-dark,#212121);white-space:nowrap}

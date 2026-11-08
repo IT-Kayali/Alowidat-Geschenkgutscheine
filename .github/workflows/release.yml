@@ -37,6 +37,14 @@ jobs:
             php tests/test-checkout-codes.php "$scenario"
           done
 
+      - name: Native Warenkorb- und Checkout-Gutscheinfelder prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          for scenario in native_cart_gift native_cart_coupon native_cart_nonce_invalid native_cart_gift_only native_ajax_gift native_ajax_coupon native_ajax_blocked native_ajax_coupon_with_gift native_remove native_optional_hidden native_default_visible native_credit_row; do
+            php tests/test-native-coupons.php "$scenario"
+          done
+
       - name: ZIP als GitHub Release veröffentlichen
         shell: bash
         env:

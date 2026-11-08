@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0 — 2026-11-08
+- Bidirektionale Gutscheineinlösung: Alowidat-Geschenkguthaben nun auch über das reguläre WooCommerce-Rabattcodefeld im klassischen Warenkorb und in der klassischen Kasse. Bestehende WooCommerce-Coupons funktionieren weiterhin im Alowidat-Einlösefeld.
+- Sichere Prüfung der nativen WooCommerce-Form- und AJAX-Nonces; Gutscheinguthaben wird nicht als Warenrabatt verarbeitet, sondern wie bisher nach Steuern und regulären Rabatten angerechnet.
+- Neue Admin-Option zum Ausblenden des zusätzlichen Alowidat-Codefeldes ohne Verlust der Einlösefunktion. Standardanzeige bleibt aus Gründen der Rückwärtskompatibilität unverändert.
+- Entfernen-Link in der Guthaben-Zeile auch bei ausgeblendetem Feld; Checkout-/Warenkorb-Aktualisierung nach dem Entfernen.
+- Erweitertes Regressionstest-Set für native Formular- und AJAX-Eingaben, Standardcoupon-Fallback, optionale Anzeige, Session und das Entfernen.
+- Gutscheindaten, andere Plugins, PHP-Anforderungen, Steuerbehandlung und WooCommerce-Block-Inkompatibilität unverändert.
+
 ## 1.5.0 — 2026-11-08
 - Gemeinsames Feld im klassischen WooCommerce-Checkout, Warenkorb und Einlöse-Shortcode für **Geschenkgutscheine und normale WooCommerce-Rabattcodes**.
 - Erkennt vorhandene Alowidat-Geschenkgutscheine und übergibt gewöhnliche Rabattcodes an die WooCommerce-Validierung mit allen vorhandenen Einschränkungen und Fehlermeldungen.

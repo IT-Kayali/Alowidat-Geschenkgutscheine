@@ -7,7 +7,7 @@ final class ALW_Gift_Cards {
     public static function settings() {
         return wp_parse_args( get_option( 'alw_gc_settings', array() ), array(
             'amounts' => '25,50,100', 'minimum' => 20, 'maximum' => 500,
-            'gold' => '#d4b45c', 'dark' => '#212121', 
+            'gold' => '#d4b45c', 'dark' => '#212121', 'auto_redeem_field' => 'yes', 
         ) );
     }
 
@@ -34,6 +34,13 @@ final class ALW_Gift_Cards {
         add_shortcode( 'alowidat_gutschein_einloesen', array( __CLASS__, 'redeem_shortcode' ) );
         add_action( 'wp_enqueue_scripts', array( __CLASS__, 'assets' ) );
         add_action( 'template_redirect', array( __CLASS__, 'handle_forms' ), 20 );
+        // Native WooCommerce-Couponfelder: klassischer Warenkorb (POST) sowie AJAX-Kasse.
+        // Nur eigene Guthabencodes abfangen; gewöhnliche Coupons bleiben beim WC-Core.
+        add_action( 'wp_loaded', array( __CLASS__, 'intercept_native_cart_coupon' ), 19 );
+        add_action( 'wp_loaded', array( __CLASS__, 'remove_native_gift_code' ), 19 );
+        add_action( 'wc_ajax_apply_coupon', array( __CLASS__, 'intercept_native_ajax_coupon' ), 1 );
+        add_action( 'wp_ajax_woocommerce_apply_coupon', array( __CLASS__, 'intercept_native_ajax_coupon' ), 1 );
+        add_action( 'wp_ajax_nopriv_woocommerce_apply_coupon', array( __CLASS__, 'intercept_native_ajax_coupon' ), 1 );
         add_filter( 'woocommerce_add_to_cart_validation', array( __CLASS__, 'protect_product' ), 10, 3 );
         add_filter( 'woocommerce_get_cart_item_from_session', array( __CLASS__, 'restore_cart_item' ), 20, 2 );
         add_action( 'woocommerce_before_calculate_totals', array( __CLASS__, 'set_prices' ), 20 );
@@ -247,6 +254,101 @@ final class ALW_Gift_Cards {
         return true;
     }
 
+    /**
+     * Gutscheinguthaben darf nie als WooCommerce-Rabattcoupon verbucht werden.
+     * Die Einlösung wird in die bereits vorhandene WC-Session geschrieben und
+     * erst nach normalen Rabatten und Steuern vom Zahlbetrag abgezogen.
+     *
+     * @return bool true, falls der Code eine vorhandene Alowidat-Geschenkkarte ist
+     */
+    public static function apply_gift_code( $code ) {
+        $card = ALW_Gift_DB::find_code( $code );
+        if ( ! $card ) { return false; }
+        if ( ! self::limit_requests( 'apply', 15 ) ) {
+            wc_add_notice( 'Zu viele Versuche. Bitte später erneut versuchen.', 'error' );
+            return true;
+        }
+        if ( ! ALW_Gift_DB::active( $card ) || 'EUR' !== get_woocommerce_currency() ) {
+            wc_add_notice( 'Geschenkgutschein ungültig, abgelaufen oder ohne Guthaben.', 'error' );
+            return true;
+        }
+        if ( ! WC()->cart || ! WC()->session || WC()->cart->is_empty() ) {
+            wc_add_notice( 'Bitte lege zuerst ein Produkt in den Warenkorb.', 'error' );
+            return true;
+        }
+        $previous = WC()->session->get( 'alw_gc_code', '' );
+        WC()->session->set( 'alw_gc_code', $code );
+        WC()->cart->calculate_totals();
+        if ( (int) WC()->session->get( 'alw_gc_applied_cents', 0 ) <= 0 ) {
+            // Vorherige gültige Einlösung bei erfolglosem Wechsel nicht verlieren.
+            if ( is_string( $previous ) && '' !== $previous && $previous !== $code ) {
+                WC()->session->set( 'alw_gc_code', $previous );
+                WC()->cart->calculate_totals();
+            } else {
+                WC()->session->__unset( 'alw_gc_code' );
+                WC()->session->__unset( 'alw_gc_card_id' );
+                WC()->session->__unset( 'alw_gc_applied_cents' );
+            }
+            wc_add_notice( 'Für diese Bestellung kann kein Geschenkguthaben eingesetzt werden (z. B. beim Kauf eines neuen Gutscheins).', 'error' );
+            return true;
+        }
+        wc_add_notice( 'Alowidat Geschenkgutschein erfolgreich angewendet.', 'success' );
+        return true;
+    }
+
+    /**
+     * WooCommerce-Warenkorb-Couponformular (wp_loaded, vor WC_Form_Handler).
+     * Normale Coupons weder verändern noch durch das Plugin bestätigen.
+     */
+    public static function intercept_native_cart_coupon() {
+        if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) || empty( $_POST['apply_coupon'] ) || ! isset( $_POST['coupon_code'] ) ) { return; }
+        if ( ! is_string( $_POST['coupon_code'] ) || ! function_exists( 'WC' ) || ! WC()->cart || ! WC()->session ) { return; }
+        $nonce = sanitize_text_field( wp_unslash( $_POST['woocommerce-cart-nonce'] ?? $_POST['_wpnonce'] ?? '' ) );
+        if ( ! wp_verify_nonce( $nonce, 'woocommerce-cart' ) ) { return; }
+        $code = sanitize_text_field( wp_unslash( $_POST['coupon_code'] ) );
+        if ( ! ALW_Gift_DB::find_code( $code ) ) { return; }
+        self::apply_gift_code( $code );
+        wc_nocache_headers();
+        wp_safe_redirect( wc_get_cart_url() );
+        exit;
+    }
+
+    /**
+     * Standard-Couponformular der klassischen Kasse (wc-ajax=apply_coupon).
+     * Das WC-JavaScript erwartet Notices als HTML, danach ein Checkout-Refresh.
+     */
+    public static function intercept_native_ajax_coupon() {
+        if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) || ! isset( $_POST['coupon_code'] ) || ! is_string( $_POST['coupon_code'] ) ) { return; }
+        if ( ! function_exists( 'WC' ) || ! WC()->cart || ! WC()->session ) { return; }
+        // Die offizielle WC-Sicherheitsprüfung verwenden, auch bei Gastbestellungen.
+        check_ajax_referer( 'apply-coupon', 'security' );
+        $code = sanitize_text_field( wp_unslash( $_POST['coupon_code'] ) );
+        if ( ! ALW_Gift_DB::find_code( $code ) ) { return; }
+        self::apply_gift_code( $code );
+        wc_print_notices();
+        wp_die();
+    }
+
+    /** Link aus der Guthaben-Zeile: funktioniert auch bei ausgeblendetem Plugin-Feld. */
+    public static function remove_native_gift_code() {
+        if ( 'GET' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) || ! isset( $_GET['alw_gc_remove'] ) ) { return; }
+        if ( ! WC()->session || ! WC()->cart ) { return; }
+        $return = sanitize_key( wp_unslash( $_GET['alw_gc_return'] ?? 'cart' ) );
+        $url = 'checkout' === $return ? wc_get_checkout_url() : wc_get_cart_url();
+        $nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ?? '' ) );
+        if ( ! wp_verify_nonce( $nonce, 'alw_gc_remove_native' ) ) {
+            wc_add_notice( 'Sicherheitsprüfung fehlgeschlagen.', 'error' );
+        } else {
+            WC()->session->__unset( 'alw_gc_code' );
+            WC()->session->__unset( 'alw_gc_card_id' );
+            WC()->session->__unset( 'alw_gc_applied_cents' );
+            WC()->cart->calculate_totals();
+            wc_add_notice( 'Geschenkguthaben entfernt.', 'success' );
+        }
+        wp_safe_redirect( $url );
+        exit;
+    }
+
     public static function handle_forms() {
         if ( is_admin() || 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) || empty( $_POST['alw_gc_action'] ) ) { return; }
         $action = sanitize_key( wp_unslash( $_POST['alw_gc_action'] ) );
@@ -278,43 +380,18 @@ final class ALW_Gift_Cards {
                 wc_add_notice( 'Dieser Rabattcode ist nicht aktiv.', 'error' );
             }
         } else {
-            if ( ! self::limit_requests( 'apply', 15 ) ) {
-                wc_add_notice( 'Zu viele Versuche. Bitte später erneut versuchen.', 'error' );
-                return;
-            }
             $code = sanitize_text_field( wp_unslash( $_POST['alw_gc_code'] ?? '' ) );
             if ( '' === trim( $code ) ) {
                 wc_add_notice( 'Bitte einen Gutschein- oder Rabattcode eingeben.', 'error' );
                 return;
             }
 
-            // Ein Eingabefeld, zwei unterschiedliche Systeme:
-            // 1. Geschenkguthaben bleibt eine Zahlung nach Steuern und Rabatten.
-            // 2. Normale Rabattcodes werden unverändert von WooCommerce geprüft.
-            $card = ALW_Gift_DB::find_code( $code );
-            if ( $card ) {
-                if ( ! ALW_Gift_DB::active( $card ) || 'EUR' !== get_woocommerce_currency() ) {
-                    wc_add_notice( 'Geschenkgutschein ungültig, abgelaufen oder ohne Guthaben.', 'error' );
+            // Eigens Feld akzeptiert beide Codearten; WC-Rabatte bleiben WC-Rabatte.
+            if ( ! self::apply_gift_code( $code ) ) {
+                if ( ! wc_coupons_enabled() ) {
+                    wc_add_notice( 'Dieser Code wurde nicht als Geschenkgutschein gefunden. Normale Rabattcodes sind derzeit deaktiviert.', 'error' );
                     return;
                 }
-                WC()->session->set( 'alw_gc_code', $code );
-                WC()->cart->calculate_totals();
-                $applied = (int) WC()->session->get( 'alw_gc_applied_cents', 0 );
-                if ( $applied <= 0 ) {
-                    WC()->session->__unset( 'alw_gc_code' );
-                    WC()->session->__unset( 'alw_gc_card_id' );
-                    WC()->session->__unset( 'alw_gc_applied_cents' );
-                    wc_add_notice( 'Geschenkguthaben kann nicht für den Kauf weiterer Geschenkgutscheine verwendet werden.', 'error' );
-                    return;
-                }
-                wc_add_notice( 'Alowidat Geschenkgutschein erfolgreich angewendet.', 'success' );
-            } elseif ( ! wc_coupons_enabled() ) {
-                wc_add_notice( 'Dieser Code wurde nicht als Geschenkgutschein gefunden. Normale Rabattcodes sind derzeit deaktiviert.', 'error' );
-                return;
-            } else {
-                // Beachtet Ablaufdatum, Mindestbetrag, Nutzungslimits,
-                // Produktausschlüsse und weitere WooCommerce-Coupon-Regeln.
-                // WooCommerce erzeugt eigene Erfolgs- bzw. Fehlermeldungen.
                 if ( WC()->cart->apply_coupon( wc_format_coupon_code( $code ) ) ) {
                     WC()->cart->calculate_totals();
                 }
@@ -468,12 +545,25 @@ final class ALW_Gift_Cards {
 
     public static function credit_totals_row() {
         $credit = WC()->session ? (int) WC()->session->get( 'alw_gc_applied_cents', 0 ) : 0;
-        if ( $credit > 0 ) { echo '<tr class="alw-gc-credit-row"><th>Alowidat Guthaben</th><td data-title="Guthaben">−' . wp_kses_post( self::money( $credit ) ) . '</td></tr>'; }
+        if ( $credit <= 0 ) { return; }
+        $is_checkout = function_exists( 'is_checkout' ) && is_checkout();
+        $url = $is_checkout ? wc_get_checkout_url() : wc_get_cart_url();
+        $remove_url = wp_nonce_url( add_query_arg( array(
+            'alw_gc_remove' => '1',
+            'alw_gc_return' => $is_checkout ? 'checkout' : 'cart',
+        ), $url ), 'alw_gc_remove_native' );
+        echo '<tr class="alw-gc-credit-row"><th>Alowidat Guthaben</th><td data-title="Guthaben">−'
+            . wp_kses_post( self::money( $credit ) )
+            . ' <a class="alw-gc-remove-credit" href="' . esc_url( $remove_url ) . '">Entfernen</a></td></tr>';
     }
 
     public static function redeem_shortcode() { ob_start(); self::redeem_widget(); return ob_get_clean(); }
-    public static function cart_redeem_ui() { self::redeem_widget(); }
-    public static function checkout_redeem_ui() { if ( ! is_order_received_page() ) { self::redeem_widget(); } }
+    public static function cart_redeem_ui() {
+        if ( 'yes' === self::settings()['auto_redeem_field'] ) { self::redeem_widget(); }
+    }
+    public static function checkout_redeem_ui() {
+        if ( 'yes' === self::settings()['auto_redeem_field'] && ! is_order_received_page() ) { self::redeem_widget(); }
+    }
 
     private static function redeem_widget() {
         if ( ! WC()->cart || WC()->cart->is_empty() ) { return; }
