@@ -1,0 +1,56 @@
+name: WordPress ZIP und GitHub Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: alowidat-plugin-release
+  cancel-in-progress: false
+
+jobs:
+  package-release:
+    name: Plugin prüfen, ZIP bauen und veröffentlichen
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Quellcode abrufen
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Plugin testen und ZIP erstellen
+        shell: bash
+        run: bash tools/build-release.sh
+
+      - name: ZIP als GitHub Release veröffentlichen
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(cat dist/VERSION)"
+          tag="v${version}"
+          file="dist/alowidat-geschenkgutscheine-v${version}.zip"
+
+          # Eine Versionsnummer bezeichnet genau einen unveränderlichen Release.
+          # So entsteht kein unbemerkt abweichender Code unter derselben ZIP-Version.
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release ${tag} existiert bereits. Für Codeänderungen zuerst die Plugin-Versionsnummer, README und CHANGELOG erhöhen."
+            exit 1
+          fi
+
+          gh release create "$tag" "$file" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Alowidat Geschenkgutscheine ${tag}" \
+            --notes-file dist/RELEASE_NOTES.md \
+            --latest
+
+          echo "Release erstellt: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
