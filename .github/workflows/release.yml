@@ -29,6 +29,14 @@ jobs:
         shell: bash
         run: bash tools/build-release.sh
 
+      - name: Gutschein- und Rabattcode-Regressionsprüfungen
+        shell: bash
+        run: |
+          set -euo pipefail
+          for scenario in gift coupon coupon_with_gift remove_coupon_with_gift remove_gift_with_coupon invalid_coupon render_both fixed_cart_gift_protected fixed_cart_normal_ok; do
+            php tests/test-checkout-codes.php "$scenario"
+          done
+
       - name: ZIP als GitHub Release veröffentlichen
         shell: bash
         env:

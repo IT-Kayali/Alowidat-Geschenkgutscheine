@@ -2,11 +2,11 @@
 
 Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit moderner Formularoberfläche, Empfänger-E-Mail, personalisierter Grußbotschaft, Restguthaben, Admin-Verwaltung und Steuer-neutraler Guthabenanrechnung.
 
-**Version:** 1.4.0 · **Sprache:** Deutsch · **Währung:** EUR · **WordPress:** ab 6.4 · **PHP:** ab 7.4 mit OpenSSL · **WooCommerce:** ab 8.4
+**Version:** 1.5.0 · **Sprache:** Deutsch · **Währung:** EUR · **WordPress:** ab 6.4 · **PHP:** ab 7.4 mit OpenSSL · **WooCommerce:** ab 8.4
 
 ## Installation
 
-1. Die ZIP `alowidat-geschenkgutscheine-1.4.0.zip` unter **WordPress → Plugins → Plugin hochladen** installieren und aktivieren.
+1. Die ZIP `alowidat-geschenkgutscheine-v1.5.0.zip` unter **WordPress → Plugins → Plugin hochladen** installieren und aktivieren.
 2. WooCommerce muss aktiviert sein; die Shopwährung muss auf **EUR** stehen.
 3. Unter **WooCommerce → Geschenkgutscheine → Einstellungen & Shortcodes** Werte, Mindest-/Höchstbetrag und Farben konfigurieren. Wenn du den Höchstbetrag entfernst und speicherst, steht auf der Gutscheinseite nur „Ab 20 €“.
 4. Eine Seite „Geschenkgutscheine“ erstellen und den Shortcode `[alowidat_gutscheine]` (Elementor-Shortcode-Widget oder WP-Shortcode-Block) einfügen.
@@ -31,10 +31,13 @@ Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit mode
 - Feste Nennwerte **25 / 50 / 100 €**, frei wählbarer Betrag **ab 20 €** bis zu einem optional konfigurierbaren Maximum (Standard für bestehende Konfigurationen: 500 €). **Maximalfeld leer lassen**: Im Frontend erscheint ausschließlich **„Ab 20 €“**; die Eingabe besitzt keine individuell konfigurierte Obergrenze. Das bisherige technische Sicherheitslimit von **10.000 € je Gutschein** bleibt bestehen.
 - Wahl zwischen Versand an eigene Rechnungs-E-Mail-Adresse oder andere Person mit E-Mail, Name und Nachricht.
 - Gutscheine werden **erst nach bezahlter Bestellung** (processing/completed) erstellt und per HTML-E-Mail verschickt.
-- Einlösung im klassischen WooCommerce-Warenkorb und Checkout, plus `[alowidat_gutschein_einloesen]`.
+- **Gemeinsames Einlösefeld für Alowidat-Geschenkgutscheine und normale WooCommerce-Rabattcodes** im klassischen Warenkorb und Checkout, plus `[alowidat_gutschein_einloesen]`.
+- Eingabe erkennt zuerst aktive bzw. vorhandene Alowidat-Geschenkgutscheine. Andere Codes werden mit WooCommerce `WC()->cart->apply_coupon()` geprüft; WooCommerce-Einstellungen und Einschränkungen für Rabattcodes bleiben wirksam.
+- Auch bei bereits aktivem Geschenkguthaben bleibt das Eingabefeld sichtbar, damit Kunden weitere Rabattcodes hinzufügen können. Aktive Codes können unabhängig voneinander über eigene Entfernen-Buttons abgewählt werden.
+- Rabattcodes werden zuerst auf die normalen Waren-/Steuerwerte angewandt; das Geschenkguthaben deckt anschließend den verbleibenden Zahlbetrag. Für Geschenk-Guthaben gelten keine Sale-Ausschlüsse. Bedingungen normaler WooCommerce-Rabattcodes (z. B. individuelles Verwenden, Mindestbestellwert oder Produktbindung) werden weiterhin eingehalten.
 - Uneingeschränkt mit **normalen Rabattcodes, Sale-Artikeln und Aktionen kombinierbar**. Rabatte laufen vor der Guthabenanrechnung.
 - Einlösung als **Guthaben/Bezahlung**; Guthaben wird erst nach Rabatt- und Steuerberechnung vom Brutto-Gesamtbetrag abgezogen.
-- Der Kauf weiterer Gutscheine mit Gutscheinguthaben ist aus Missbrauchsschutz ausgeschlossen. Normale Rabattcodes reduzieren den Gutscheinverkauf nicht.
+- Der Kauf weiterer Gutscheine mit Gutscheinguthaben ist aus Missbrauchsschutz ausgeschlossen. Normale Rabattcodes dürfen den Verkauf eines neuen Geschenkgutscheins nicht verbilligen. **Feste Warenkorb-Rabattcodes** werden sicherheitshalber abgewiesen, wenn zugleich ein neuer Geschenkgutschein im Warenkorb liegt; normale Parfüm-Bestellungen mit Geschenkguthaben sind davon nicht betroffen.
 - Mehrfache Verwendung bis zur vollständigen Aufbrauchung, mit Transaktionsprotokoll.
 - Gutschein erst bei bezahltem Auftrag aktiv, Code per 96-Bit-Zufall, HMAC-Suchindex, AES-256-GCM verschlüsselt in der Datenbank.
 - Atomares Reservieren per InnoDB-Transaktion, Gutschrift bei Stornierung/Fehlschlag/Vollerstattung.
@@ -42,7 +45,7 @@ Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit mode
 - HPOS-kompatible WooCommerce-Bestell-API; WooCommerce-Standardfunktionen für Produkte/Bestellungen.
 - Kaufgutscheine: Laufzeit standardmäßig bis zum Ende des dritten Folgekalenderjahrs (§ 195, § 199 BGB), ausgehend vom Ausgabejahr. Individuelle rechtliche Einordnung prüfen.
 
-## Rückgabe, Widerruf und Barauszahlung (v1.4.0)
+## Rückgabe, Widerruf und Barauszahlung (seit v1.4.0)
 
 - Auf der Gutscheinkauf-Seite und im **klassischen Checkout** bei Gutscheinbestellungen erscheint ein gut sichtbarer Hinweis: **„Beim Onlinekauf von Geschenkgutscheinen gilt grundsätzlich das gesetzliche 14-tägige Widerrufsrecht. Darüber hinaus bieten wir keine freiwillige Rücknahme oder einen Umtausch an. Eine Barauszahlung des Gutschein- oder Restguthabens ist, außer bei gesetzlichen Ansprüchen, ausgeschlossen.“**
 - **Wichtig:** Es gibt **keinen pauschalen Ausschluss des gesetzlichen Widerrufsrechts**. Der digitale Gutschein-Code ist kein automatisch widerrufsfreier Download. Der Hinweis allein ersetzt auch **nicht** die rechtlich erforderlichen Widerrufsbelehrungen und AGB des Shops.

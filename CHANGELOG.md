@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0 — 2026-11-08
+- Gemeinsames Feld im klassischen WooCommerce-Checkout, Warenkorb und Einlöse-Shortcode für **Geschenkgutscheine und normale WooCommerce-Rabattcodes**.
+- Erkennt vorhandene Alowidat-Geschenkgutscheine und übergibt gewöhnliche Rabattcodes an die WooCommerce-Validierung mit allen vorhandenen Einschränkungen und Fehlermeldungen.
+- Auch bei aktivem Geschenkgutschein bleibt die Eingabe sichtbar; mehrere normale Rabattcodes (soweit WooCommerce dies zulässt) sowie das Guthaben können gemeinsam verwendet werden.
+- Einzelnes Entfernen von Geschenkguthaben und Rabattcodes direkt im Einlösebereich. Kein Verlust bereits angewendeter anderer Codes.
+- Feste WooCommerce-Warenkorb-Rabatte werden beim Kauf eines neuen Geschenkgutscheins blockiert, da die normale Produktausschlussregel solche Rabatte nicht immer verhindert. Die Kombination von Rabattcodes mit bereits vorhandenem Geschenkguthaben bleibt möglich.
+- Responsive Darstellung im bestehenden Schwarz-Gold-Stil; Gutschein-Datenbank, Steuern, bestehende Guthaben und das separate Gratisprodukt-Plugin unverändert.
+
 ## 1.4.0 — 2026-11-08
 - Klarer Hinweis auf der Geschenkgutschein-Kaufseite und bei Geschenkgutscheinen im klassischen WooCommerce-Checkout: keine freiwillige Rücknahme, kein freiwilliger Umtausch und keine Barauszahlung von Guthaben außerhalb gesetzlicher Ansprüche.
 - Das gesetzliche 14-tägige Widerrufsrecht für online gekaufte Wertgutscheine bleibt ausdrücklich erhalten. Kein unzulässiger pauschaler Ausschluss und keine irreführende "Digitalcode = kein Widerruf"-Klausel.
