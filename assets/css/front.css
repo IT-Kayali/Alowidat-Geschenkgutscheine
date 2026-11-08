@@ -1,0 +1,86 @@
+/* Alowidat Geschenkgutscheine – gekapseltes Frontend, WoodMart-/Elementor-freundlich. */
+.alw-gc-wrap,.alw-gc-simple,.alw-gc-redeem{--alw-ink:var(--alw-gc-dark,#171715);--alw-gold:var(--alw-gc-gold,#b59b65);--alw-cream:#f8f6f1;--alw-border:#e7e1d6;font-family:inherit;color:var(--alw-ink)}
+.alw-gc-wrap{max-width:1180px;margin:35px auto 65px;padding:0 16px}.alw-gc-intro{text-align:center;max-width:690px;margin:0 auto 36px}.alw-gc-eyebrow{font-size:11px;letter-spacing:3px;color:var(--alw-gold);font-weight:750}.alw-gc-intro h2{font-size:clamp(29px,3.3vw,47px);line-height:1.12;letter-spacing:-1.2px;margin:12px 0 17px;font-weight:650;color:var(--alw-ink)}.alw-gc-intro p{font-size:16px;color:#716c64;line-height:1.75;margin:0}.alw-gc-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:0;background:#fff;border:1px solid var(--alw-border);box-shadow:0 16px 56px rgba(25,23,20,.055);border-radius:18px;overflow:hidden}
+.alw-gc-visual{position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:580px;padding:40px;background:radial-gradient(ellipse at 100% 0%,rgba(190,159,99,.18),transparent 48%),radial-gradient(ellipse at 10% 100%,rgba(190,159,99,.11),transparent 45%),linear-gradient(135deg,#282722,var(--alw-ink) 66%,#10100f);color:#fff;isolation:isolate;overflow:hidden}.alw-gc-visual:before,.alw-gc-visual:after{content:"";position:absolute;border:1px solid rgba(224,196,139,.15);border-radius:50%;z-index:-1;pointer-events:none}.alw-gc-visual:before{width:520px;height:520px;top:90px;left:-200px}.alw-gc-visual:after{width:360px;height:360px;bottom:-195px;right:-90px}.alw-gc-visual-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.alw-gc-wordmark{font-family:Georgia,serif;font-size:30px;letter-spacing:4px;font-weight:600}.alw-gc-small{letter-spacing:2px;color:#d8c7a7;font-size:10px;margin-top:9px}.alw-gc-ornament{text-align:center;margin:auto;color:#cbb17d;font-size:78px;opacity:.74;text-shadow:0 0 42px rgba(196,164,98,.3)}.alw-gc-visual-bottom>span{font-size:12px;letter-spacing:3px;color:#cbb17d;font-weight:650}.alw-gc-preview-value{display:block;margin:10px 0;font-family:Georgia,serif;font-size:clamp(58px,6vw,100px);font-weight:400;line-height:1.2;color:#f0dec0;letter-spacing:-4px}.alw-gc-visual-bottom small{display:block;margin-top:10px;letter-spacing:.5px;font-size:12px;color:#d5d0c6}
+.alw-gc-buy{padding:43px 44px 35px;min-width:0}.alw-gc-buy h3{font-size:26px;letter-spacing:-.6px;color:var(--alw-ink);margin:0 0 10px;font-weight:650}.alw-gc-muted{color:#777168;line-height:1.65;font-size:14px;margin:0 0 30px}.alw-gc-label,.alw-gc-buy .alw-gc-field label,.alw-gc-custom label{display:block;font-size:13px;font-weight:700;color:var(--alw-ink);margin:0 0 11px}.alw-gc-amounts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 25px}.alw-gc-amount{cursor:pointer;position:relative;display:block;margin:0}.alw-gc-amount input{position:absolute;opacity:0;inset:0}.alw-gc-amount span{display:flex;align-items:center;justify-content:center;min-height:52px;padding:9px 12px;border:1px solid var(--alw-border);border-radius:9px;background:#fff;color:#302f2a;font-size:15px;font-weight:650;transition:background .18s,color .18s,border .18s,box-shadow .18s}.alw-gc-amount input:checked+span{border-color:var(--alw-ink);background:var(--alw-ink);color:#fff;box-shadow:0 6px 15px rgba(24,23,21,.13)}.alw-gc-amount input:focus-visible+span{outline:3px solid var(--alw-gold);outline-offset:2px}.alw-gc-custom{margin:-9px 0 22px;padding:16px;border-radius:9px;background:var(--alw-cream)}.alw-gc-custom[hidden],.alw-gc-recipient[hidden]{display:none}.alw-gc-custom input,.alw-gc-buy .alw-gc-field input,.alw-gc-buy .alw-gc-field textarea{width:100%;max-width:100%;box-sizing:border-box;min-height:46px;background:#fff!important;border:1px solid var(--alw-border)!important;border-radius:8px!important;padding:12px!important;font:inherit!important;font-size:14px!important;color:#26231f!important;box-shadow:none!important}.alw-gc-buy .alw-gc-field textarea{min-height:90px;resize:vertical}.alw-gc-buy :is(input,textarea):focus{outline:2px solid rgba(181,155,101,.43);outline-offset:1px}.alw-gc-custom small{display:block;margin-top:7px;color:#76716b}.alw-gc-targets{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 23px}.alw-gc-targets label{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-weight:500;font-size:14px}.alw-gc-targets input{accent-color:var(--alw-ink);margin:0}.alw-gc-recipient{display:grid;gap:15px;margin-bottom:23px}.alw-gc-recipient .alw-gc-field label{margin-bottom:7px}.alw-gc-recipient .alw-gc-field label small{font-weight:400;color:#89847a}.alw-gc-primary{width:100%;border:0!important;border-radius:9px!important;background:var(--alw-ink)!important;color:#fff!important;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:17px 22px!important;min-height:56px;cursor:pointer;font-weight:700!important;font-size:14px!important;transition:background .2s,transform .2s}.alw-gc-primary:hover{background:#39352c!important;transform:translateY(-1px)}.alw-gc-button-value{color:#e8d3ab}.alw-gc-help{color:#837e76!important;font-size:12px!important;line-height:1.75!important;margin:14px 0 0!important}
+.alw-gc-simple,.alw-gc-redeem{background:#fcfaf6;border:1px solid var(--alw-border);border-radius:12px;padding:24px;margin:20px 0}.alw-gc-simple h3{font-size:22px;margin:0 0 9px}.alw-gc-simple p,.alw-gc-redeem p{font-size:13px;color:#766f66;margin:7px 0 12px}.alw-gc-simple label{display:block;font-weight:600;font-size:13px;margin:15px 0 8px}.alw-gc-inline{display:flex;align-items:center;gap:10px}.alw-gc-inline input[type=text]{flex:1;min-width:0;min-height:43px;border:1px solid #ddd5c7!important;border-radius:7px!important;padding:10px 13px!important;background:#fff!important;box-sizing:border-box}.alw-gc-inline button{flex-shrink:0;min-height:43px;background:var(--alw-ink)!important;border:0!important;color:#fff!important;border-radius:7px!important;padding:10px 19px!important;font-size:13px!important;font-weight:700!important;cursor:pointer}.alw-gc-redeem{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}.alw-gc-redeem>div:first-child{flex:1;min-width:215px}.alw-gc-redeem strong{font-size:14px;color:var(--alw-ink)}.alw-gc-redeem .alw-gc-inline{flex:1;min-width:280px}.alw-gc-active span{display:block;flex:1;font-size:13px;color:#534b40}.alw-gc-balance-result{margin-top:16px;padding:18px;background:#fff;border:1px solid var(--alw-border);border-radius:10px}.alw-gc-balance-result strong{display:block;font-size:23px;color:var(--alw-ink);margin:5px 0}.alw-gc-balance-result small{color:#7b766d}.alw-gc-error{color:#a12420!important}.alw-gc-credit-row td{color:#2d734c!important;font-weight:700!important}
+@media(max-width:850px){.alw-gc-layout{grid-template-columns:1fr}.alw-gc-visual{min-height:370px;padding:30px}.alw-gc-ornament{font-size:50px}.alw-gc-preview-value{font-size:66px}.alw-gc-buy{padding:30px}}@media(max-width:480px){.alw-gc-wrap{padding:0 9px}.alw-gc-visual{min-height:330px;padding:25px}.alw-gc-wordmark{font-size:24px}.alw-gc-small{font-size:9px}.alw-gc-visual-bottom>span{letter-spacing:2px}.alw-gc-preview-value{font-size:55px}.alw-gc-buy{padding:25px 20px}.alw-gc-buy h3{font-size:23px}.alw-gc-targets{gap:14px}.alw-gc-inline{flex-direction:column;align-items:stretch}.alw-gc-redeem .alw-gc-inline{min-width:0;width:100%}.alw-gc-redeem .alw-gc-inline button{width:100%}}
+
+/* Version 1.1.0 — WooCommerce Mein Konto / Mein Guthaben. */
+.alw-gc-account,.alw-gc-wallet-dashboard-shortcut{--alw-ink:var(--alw-gc-dark,#212121);--alw-gold:var(--alw-gc-gold,#d4b45c);--alw-wallet-border:#ebe6dd;color:#242321;font-family:inherit}
+.alw-gc-account *,.alw-gc-wallet-dashboard-shortcut *{box-sizing:border-box}
+.alw-gc-account{max-width:100%;padding:0 0 30px}
+.alw-gc-wallet-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 23px}
+.alw-gc-wallet-eyebrow{display:block;margin-bottom:10px;color:#a0803d;letter-spacing:2.1px;font-size:10px;font-weight:750}
+.alw-gc-wallet-head h2{font-size:clamp(24px,2.4vw,32px);margin:0 0 8px!important;font-weight:650;line-height:1.2;color:#262523}
+.alw-gc-wallet-head p{font-size:14px;color:#77736d;margin:0}
+.alw-gc-wallet-head-icon{display:grid;place-items:center;flex:none;border:1px solid #eae0c6;border-radius:50%;width:46px;height:46px;color:#b79d5f;font-size:22px}
+.alw-gc-wallet-hero{position:relative;min-height:228px;padding:28px 34px;overflow:hidden;color:#fff;background:radial-gradient(circle at 80% -20%,rgba(220,179,85,.16),transparent 48%),linear-gradient(125deg,#292929,var(--alw-ink) 70%,#171717);border:1px solid #35312b;border-radius:15px;box-shadow:0 10px 25px rgba(14,14,14,.08)}
+.alw-gc-wallet-hero:after{content:"";pointer-events:none;position:absolute;border:1px solid rgba(214,184,104,.22);width:280px;height:280px;border-radius:50%;top:-75px;right:-80px}
+.alw-gc-wallet-hero-top{display:flex;align-items:center;justify-content:space-between;gap:15px;position:relative;z-index:1}
+.alw-gc-wallet-hero-top span{font-family:Georgia,serif;color:var(--alw-gold);font-size:26px;letter-spacing:2px;line-height:1.3}
+.alw-gc-wallet-hero-top small{letter-spacing:2px;color:#ded5c3;font-size:10px}
+.alw-gc-wallet-hero-content{position:relative;z-index:1;margin-top:38px}
+.alw-gc-wallet-hero-content>span{display:block;color:#ded9cf;font-size:12px;letter-spacing:.4px}
+.alw-gc-wallet-hero-content>strong{display:block;margin:9px 0 5px;font-size:clamp(33px,3.5vw,47px);font-weight:550;line-height:1.1;color:#fff}
+.alw-gc-wallet-hero-content .woocommerce-Price-amount,.alw-gc-wallet-hero-content .woocommerce-Price-currencySymbol{color:#fff}
+.alw-gc-wallet-hero-content>small{font-size:12px;color:#d9cda9}
+.alw-gc-wallet-hero-mark{position:absolute;right:18%;bottom:25px;font-family:Georgia,serif;color:rgba(212,180,92,.28);font-size:68px}
+.alw-gc-wallet-columns{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-top:18px}
+.alw-gc-wallet-card{border:1px solid var(--alw-wallet-border);border-radius:12px;background:#fff;padding:24px;min-width:0}
+.alw-gc-wallet-section-head h3{font-size:19px;color:#262523;margin:0 0 7px!important;line-height:1.35;font-weight:650}
+.alw-gc-wallet-section-head p{color:#7e7a72;font-size:13px;line-height:1.65;margin:0 0 18px}
+.alw-gc-wallet-save form label{font-size:12px;font-weight:700;color:#38352e;display:block;margin:0 0 7px}
+.alw-gc-wallet-save-fields{display:flex;gap:8px;align-items:stretch}
+.alw-gc-wallet-save-fields input{min-height:44px;flex:1;min-width:0;padding:10px 12px!important;background:#fff!important;color:#28251f!important;border:1px solid #ded8cd!important;border-radius:7px!important;box-shadow:none!important;font:inherit!important;font-size:13px!important}
+.alw-gc-wallet-save-fields input:focus{outline:2px solid rgba(212,180,92,.27);outline-offset:1px}
+.alw-gc-wallet-save-fields button,.alw-gc-wallet-action a{display:inline-flex;justify-content:center;align-items:center;gap:13px;white-space:nowrap;background:var(--alw-ink)!important;color:#fff!important;padding:11px 19px!important;font-size:12px!important;font-weight:700!important;border:0!important;border-radius:7px!important;text-decoration:none!important;cursor:pointer;transition:background .15s}
+.alw-gc-wallet-save-fields button:hover,.alw-gc-wallet-action a:hover{background:#51452e!important;color:#fff!important}
+.alw-gc-wallet-help{font-size:11px;line-height:1.6;color:#979185;margin:13px 0 0}
+.alw-gc-wallet-action{background:#fbf9f5;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.alw-gc-wallet-sparkle{font-size:29px;color:#bda15c;line-height:1.2;margin-bottom:11px}
+.alw-gc-wallet-action h3{font-size:20px;margin:0 0 9px!important;color:#252321}
+.alw-gc-wallet-action p{font-size:13px;line-height:1.7;color:#77736c;margin:0 0 19px}
+.alw-gc-wallet-list,.alw-gc-wallet-history{margin-top:34px}
+.alw-gc-wallet-list .alw-gc-wallet-section-head,.alw-gc-wallet-history .alw-gc-wallet-section-head{margin-bottom:17px}
+.alw-gc-wallet-list .alw-gc-wallet-section-head p,.alw-gc-wallet-history .alw-gc-wallet-section-head p{margin-bottom:0}
+.alw-gc-wallet-cards{display:grid;gap:11px}
+.alw-gc-wallet-voucher{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;background:#fff;border:1px solid var(--alw-wallet-border);border-radius:11px;padding:18px 20px}
+.alw-gc-wallet-voucher-main{display:flex;align-items:center;gap:14px;min-width:0}
+.alw-gc-wallet-voucher-symbol{display:grid;flex:none;place-items:center;height:45px;width:45px;border-radius:9px;background:#f4f0e7;color:#a88e52;font-size:23px}
+.alw-gc-wallet-voucher-main strong{display:block;font-size:14px;color:#252321;margin-bottom:5px}
+.alw-gc-wallet-voucher-main span:not(.alw-gc-wallet-voucher-symbol){display:block;color:#837c73;font-size:11px;line-height:1.55}
+.alw-gc-wallet-voucher-side{text-align:right;flex:none}
+.alw-gc-wallet-voucher-side>strong{display:block;color:#26231d;font-size:20px;line-height:1.3;margin-bottom:6px}
+.alw-gc-wallet-badge{display:inline-block;background:#f1efed;color:#716e69;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:650}
+.alw-gc-wallet-badge.is-active{background:#e9f3ed;color:#34724e}
+.alw-gc-wallet-code-reveal{flex:0 0 100%;padding-top:10px;border-top:1px solid #f1ede6}
+.alw-gc-wallet-code-reveal summary{display:list-item;cursor:pointer;color:#8e713d;font-weight:650;font-size:12px;width:max-content;max-width:100%}
+.alw-gc-wallet-code-reveal code{display:block;width:max-content;max-width:100%;overflow-wrap:anywhere;margin:10px 0 5px;padding:10px 13px;background:#f8f6f2;color:#29251f;border-radius:6px;font-size:12px;letter-spacing:.2px}
+.alw-gc-wallet-code-reveal>span{display:block;color:#81796e;font-size:11px}
+.alw-gc-wallet-empty{border:1px dashed #dcd1b9;border-radius:13px;background:#fdfcf9;text-align:center;padding:32px 18px}
+.alw-gc-wallet-empty>span{display:block;color:#b99b53;font-size:32px;margin-bottom:10px}
+.alw-gc-wallet-empty strong{color:#30291b;display:block;font-size:16px}
+.alw-gc-wallet-empty p{color:#888177;font-size:13px;margin:8px 0 0}
+.alw-gc-wallet-activity{overflow:hidden;border:1px solid var(--alw-wallet-border);border-radius:11px}
+.alw-gc-wallet-activity-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 20px;background:#fff;border-bottom:1px solid #f1ede6}
+.alw-gc-wallet-activity-row:last-child{border-bottom:0}
+.alw-gc-wallet-activity-row strong{display:block;color:#292722;font-size:13px;margin-bottom:3px}
+.alw-gc-wallet-activity-row small{font-size:11px;color:#898178}
+.alw-gc-wallet-activity-row>span{font-weight:700;font-size:13px;color:#34724e;white-space:nowrap}
+.alw-gc-wallet-activity-row>span.is-debit{color:#7b5544}
+.alw-gc-wallet-disclaimer{margin:28px 0 0;color:#8b847b;font-size:11px;line-height:1.7}
+.alw-gc-wallet-dashboard-shortcut{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;background:linear-gradient(125deg,#292929,var(--alw-ink));border-radius:12px;padding:20px 25px;color:#fff;margin:22px 0}
+.alw-gc-wallet-dashboard-shortcut div>span{display:block;color:var(--alw-gold);font-size:10px;font-weight:750;letter-spacing:1.7px;margin-bottom:5px}
+.alw-gc-wallet-dashboard-shortcut div>strong{display:block;font-size:24px;line-height:1.3;color:#fff}
+.alw-gc-wallet-dashboard-shortcut div>small{display:block;font-size:11px;color:#ddd4c1}
+.alw-gc-wallet-dashboard-shortcut a{display:inline-flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap;font-weight:700;color:#eddaaa!important;text-decoration:none!important}
+.alw-gc-wallet-dashboard-shortcut a:hover{color:#fff!important}
+@media(max-width:940px){.alw-gc-wallet-columns{grid-template-columns:1fr}.alw-gc-wallet-action{min-height:175px}}
+@media(max-width:580px){.alw-gc-wallet-head-icon{display:none}.alw-gc-wallet-hero{min-height:210px;padding:23px}.alw-gc-wallet-hero-content{margin-top:35px}.alw-gc-wallet-hero-top span{font-size:23px}.alw-gc-wallet-card{padding:20px}.alw-gc-wallet-save-fields{flex-direction:column}.alw-gc-wallet-save-fields button{width:100%}.alw-gc-wallet-voucher{padding:15px}.alw-gc-wallet-voucher-side{margin-left:59px;text-align:left}.alw-gc-wallet-voucher-main{width:100%}.alw-gc-wallet-voucher-side>strong{font-size:18px}.alw-gc-wallet-dashboard-shortcut{padding:20px}}
+
+/* v1.4.0 – gut lesbarer Verbraucherhinweis zum digitalen Gutscheinverkauf. */
+.alw-gc-policy{--alw-ink:var(--alw-gc-dark,#212121);--alw-gold:var(--alw-gc-gold,#d4b45c);margin:16px 0 0;padding:14px 16px;border:1px solid #e7e1d6;border-left:3px solid var(--alw-gold);border-radius:8px;background:#faf8f3;color:#5b554b;font-family:inherit;font-size:12px;line-height:1.65}
+.alw-gc-policy strong{display:block;margin:0 0 5px;color:var(--alw-ink);font-weight:700;font-size:13px}
+.alw-gc-policy p{margin:0!important;color:inherit!important;font-size:12px!important;line-height:1.7!important}
+.alw-gc-policy-checkout{margin:12px 0 18px}
