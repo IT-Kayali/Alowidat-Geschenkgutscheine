@@ -19,7 +19,7 @@ class ErrorStub{ public $codes=[];public function add($key,$message){$this->code
 class LineStub { public $p,$amt,$total,$subtotal,$q;public function __construct($p,$amt,$total,$subtotal,$q=1){$this->p=$p;$this->amt=$amt;$this->total=$total;$this->subtotal=$subtotal;$this->q=$q;}public function get_product_id(){return $this->p;}public function get_meta($key,$single){return $key==='_alw_gc_amount_cents'?$this->amt:'';}public function get_total(){return $this->total;}public function get_subtotal(){return $this->subtotal;}public function get_quantity(){return $this->q;}}
 class FeeStub { public $amount=0;private $meta;public function __construct($amount,$meta=''){ $this->amount=$amount;$this->meta=$meta; }public function get_total(){return $this->amount;} public function get_meta($key,$single){return $key==='_alw_gc_payment'?$this->meta:'';} }
 class OrderStub{public $items=[],$fees=[],$coupons=[];public function get_items($type){return $type==='fee'?$this->fees:$this->items;}public function get_coupon_codes(){return $this->coupons;}}
-require __DIR__.'/../alowidat-geschenkgutscheine/includes/class-alw-gift-cards.php';
+require __DIR__.'/../includes/class-alw-gift-cards.php';
 function eq($condition,$msg){if(!$condition){fwrite(STDERR,"FEHLER: $msg\n"); exit(1);}}
 function gift($price=50){return [ 'product_id'=>777,'quantity'=>1,'alw_gc_amount_cents'=>5000,'data'=>new ItemPrice($price),'line_total'=>50,'line_subtotal'=>50 ];}
 function normal(){return ['product_id'=>45,'quantity'=>1,'data'=>new ItemPrice(75)];}
