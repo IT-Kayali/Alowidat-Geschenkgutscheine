@@ -44,4 +44,57 @@ $o->items=[new LineStub(777,5000,'50','50')];$o->coupons=['SALE10'];$blocked=fal
 $o->coupons=[];$o->fees=[new FeeStub(-10)];$blocked=false;try{ALW_Gift_Cards::validate_gift_order_amounts($o,[]);}catch(Exception $e){$blocked=true;}eq($blocked,'Order mit negativem Rabattfee muss blockiert werden');
 $o->fees=[new FeeStub(-10,'yes')];ALW_Gift_Cards::validate_gift_order_amounts($o,[]);
 $cart->items=[normal()];$cart->coupons=['SALE10'];$err=new ErrorStub();ALW_Gift_Cards::checkout_discount_validation([], $err);eq(empty($err->codes),'Nur reguläre Ware darf weiterhin Coupon verwenden');
-echo "PASS: 16 Discount-/Hinweis-Szenarien validiert\n";
+// v1.8.0: Gemischter Warenkorb -> Rabatte nur auf reguläre Waren.
+$cart->items = [gift(), normal()];
+$cart->fees = [];
+$cart->coupons = ['SALE10'];
+foreach (['percent','fixed_cart','fixed_product','custom'] as $kind) {
+    eq(ALW_Gift_Cards::protect_gift_purchase_from_fixed_cart_coupons(true, (object)['type' => $kind]) === true, "Coupontyp $kind muss bei regulären Waren zugelassen sein");
+}
+$NOTICES = [];
+ALW_Gift_Cards::validate_no_discount_purchase();
+eq(count($NOTICES) === 0, 'Gemischter Warenkorb darf wegen eines normalen Coupons keine Kauf-Fehlermeldung erzeugen');
+$err = new ErrorStub();
+ALW_Gift_Cards::checkout_discount_validation([], $err);
+eq(empty($err->codes), 'Gemischter Warenkorb darf Checkout mit normalen Coupons nicht blockieren');
+$allow = new ReflectionProperty(ALW_Gift_Cards::class,'allow_add');
+$allow->setAccessible(true);
+$allow->setValue(null,true);
+eq(ALW_Gift_Cards::protect_product(true,777,1) === true, 'Geschenkgutschein muss zu regulären rabattfähigen Produkten hinzugefügt werden dürfen');
+$allow->setValue(null,false);
+// WC_Discounts muss Gutscheinzeilen vor Prozent- und Fest-Warenkorbrabatten herausfiltern.
+class CouponProductStub { private $id; public function __construct($id){$this->id=$id;}public function get_id(){return $this->id;} }
+$giftItem = (object)['product'=>new CouponProductStub(777),'object'=>['product_id'=>777]];
+$regularItem = (object)['product'=>new CouponProductStub(45),'object'=>['product_id'=>45]];
+$giftFromObject = (object)['product'=>new CouponProductStub(0),'object'=>['product_id'=>777]];
+foreach (['percent','fixed_cart','fixed_product'] as $kind) {
+    $filtered = ALW_Gift_Cards::exclude_gift_from_coupon_items([$giftItem, $regularItem, $giftFromObject], (object)['type'=>$kind]);
+    eq(count($filtered) === 1 && reset($filtered) === $regularItem, "Coupontyp $kind hat Gutscheinposition nicht korrekt ausgeschlossen");
+}
+eq(ALW_Gift_Cards::exclude_gift_purchase_from_discounts(true,new CouponProductStub(777),null,[]) === false, 'Produkt-Rabatt auf Gutschein nicht gesperrt');
+eq(ALW_Gift_Cards::exclude_gift_purchase_from_discounts(true,new CouponProductStub(45),null,[]) === true, 'Reguläres Produkt darf Rabatt erhalten');
+eq(ALW_Gift_Cards::exclude_gift_coupon_discount_amount(5,25,['product_id'=>777],false,null) === 0, 'Gutscheinbetrag wurde durch Rabatt verringert');
+eq(ALW_Gift_Cards::exclude_gift_coupon_discount_amount(5,25,['product_id'=>45],false,null) === 5, 'Rabatt auf reguläres Produkt wurde ungewollt gesperrt');
+$o = new OrderStub();
+$o->items = [new LineStub(777,5000,50,50),new LineStub(45,0,22.5,25)];
+$o->coupons = ['SALE10'];
+ALW_Gift_Cards::validate_gift_order_amounts($o,[]);
+$o->items = [new LineStub(777,5000,49,50),new LineStub(45,0,22.5,25)];
+$blocked = false;
+try { ALW_Gift_Cards::validate_gift_order_amounts($o,[]); } catch (Exception $e) { $blocked = true; }
+eq($blocked,'Gutscheinbetrag darf auch bei Rabatt auf reguläre Ware nicht reduziert werden');
+$o->items = [new LineStub(777,5000,50,50),new LineStub(45,0,22.5,25)];
+$o->fees = [new FeeStub(-5)];
+$blocked = false;
+try { ALW_Gift_Cards::validate_gift_order_amounts($o,[]); } catch (Exception $e) { $blocked = true; }
+eq($blocked,'Nicht zugeordnete negative Gebühren dürfen weiterhin nicht den Gutscheinpreis mindern');
+$method = new ReflectionMethod(ALW_Gift_Cards::class,'purchase_notices_html');
+$method->setAccessible(true);
+$OPTIONS['alw_gc_settings']['important_notice'] = 'Gutscheine nur zum Nennwert';
+$html = $method->invoke(null, false);
+eq(substr_count($html, '<aside') === 1, 'Kaufseite muss genau eine Hinweisbox anzeigen');
+eq(strpos($html, 'Gutscheine nur zum Nennwert') !== false && strpos($html, 'Widerrufsrecht') !== false, 'Eine Hinweisbox muss editierbaren und gesetzlichen Text enthalten');
+$OPTIONS['alw_gc_settings']['important_notice'] = '';
+$html = $method->invoke(null, false);
+eq(substr_count($html, '<aside') === 1 && strpos($html,'Widerrufsrecht') !== false, 'Gesetzlicher Hinweis muss bei leerem Zusatztext in derselben Box erhalten bleiben');
+echo "PASS: Bestehende und neue Rabatt-/Hinweis-Szenarien validiert\n";

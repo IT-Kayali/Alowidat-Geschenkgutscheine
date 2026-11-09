@@ -103,3 +103,7 @@
 .alw-gc-important-notice strong{display:block;margin-bottom:7px;color:var(--alw-ink);font-weight:700;font-size:14px}
 .alw-gc-important-notice p{margin:0!important;color:inherit!important;font-size:13px!important;line-height:1.7!important;overflow-wrap:anywhere}
 .alw-gc-important-notice-checkout{margin:12px 0 16px}
+
+/* v1.8.0: Ein gemeinsamer Hinweisblock statt zwei übereinander stehender Infoboxen. */
+.alw-gc-important-notice .alw-gc-important-copy{margin:0 0 10px!important;padding:0 0 10px;border-bottom:1px solid #eee7d8}
+.alw-gc-important-notice .alw-gc-policy-copy{font-size:12px!important;line-height:1.65!important;color:#746b5b!important;margin:0!important}

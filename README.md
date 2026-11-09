@@ -4,6 +4,16 @@ Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit mode
 
 **Version:** 1.7.0 · **Sprache:** Deutsch · **Währung:** EUR · **WordPress:** ab 6.4 · **PHP:** ab 7.4 mit OpenSSL · **WooCommerce:** ab 8.4
 
+## Gutscheinrabatte im gemischten Warenkorb (seit v1.8.0)
+
+- **Beim Gutscheinkauf ist der Nennwert immer vollständig zu bezahlen.** Geschenkgutscheine werden niemals rabattiert – weder mit prozentualen Produkt-Coupons noch mit festen Warenkorbrabatten.
+- Enthält der Warenkorb auch normale rabattfähige Waren, können WooCommerce-Rabattcodes **nur auf diese anderen Waren** angewendet werden. Beispiel: 50 € Gutscheine + 25 € Parfüm + 10 % auf Parfüm = 72,50 € Warenwert vor weiteren Versandkosten/Steuern (bei Bruttopreisen). Die 50 € Gutscheinwert bleiben unverändert.
+- Dafür werden Gutscheinpositionen mit `woocommerce_coupon_get_items_to_apply` aus der Rabattverteilung ausgeschlossen; zusätzliche Absicherung mit `woocommerce_coupon_get_discount_amount` und Prüfung der vollständigen Gutscheinposition bis zur Bestellerstellung.
+- Ein Warenkorb, der nur Gutscheine und/oder Gratisartikel enthält, bietet keine rabattfähigen Produkte. Nicht produktbezogene negative Gebühren/Rabatte externer Plugins werden zur Sicherheit weiterhin gesperrt, solange Geschenkgutscheine enthalten sind. Solche Aktionen benötigen eine gesonderte Integration.
+- Der bisherige Standard-Hinweistext wird automatisch in der Ausgabe auf die neue Regel aktualisiert; eigene Texte bleiben erhalten.
+- Unter **Wichtige Hinweise** erscheint jetzt nur **eine** Hinweisbox, mit bearbeitbarem Zusatztext und dem gesondert erhaltenen gesetzlichen Widerrufshinweis innerhalb derselben Box. Text bleibt im Backend bearbeitbar.
+- Bestehende Gutschein-Codes, Guthaben, Verfügbarkeit beider Einlösefelder und Kauf-/Checkout-Logik bleiben erhalten. Nur klassischer WooCommerce-Warenkorb/-Checkout unterstützt; WooCommerce Cart/Checkout Blocks weiterhin nicht unterstützt.
+
 ## Installation
 
 1. Die ZIP `alowidat-geschenkgutscheine-v1.6.0.zip` unter **WordPress → Plugins → Plugin hochladen** installieren und aktivieren.
@@ -37,7 +47,7 @@ Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit mode
 - Rabattcodes werden zuerst auf die normalen Waren-/Steuerwerte angewandt; das Geschenkguthaben deckt anschließend den verbleibenden Zahlbetrag. Für Geschenk-Guthaben gelten keine Sale-Ausschlüsse. Bedingungen normaler WooCommerce-Rabattcodes (z. B. individuelles Verwenden, Mindestbestellwert oder Produktbindung) werden weiterhin eingehalten.
 - Uneingeschränkt mit **normalen Rabattcodes, Sale-Artikeln und Aktionen kombinierbar**. Rabatte laufen vor der Guthabenanrechnung.
 - Einlösung als **Guthaben/Bezahlung**; Guthaben wird erst nach Rabatt- und Steuerberechnung vom Brutto-Gesamtbetrag abgezogen.
-- Der Kauf weiterer Gutscheine mit Gutscheinguthaben ist aus Missbrauchsschutz ausgeschlossen. Normale Rabattcodes dürfen den Verkauf eines neuen Geschenkgutscheins nicht verbilligen. **Feste Warenkorb-Rabattcodes** werden sicherheitshalber abgewiesen, wenn zugleich ein neuer Geschenkgutschein im Warenkorb liegt; normale Parfüm-Bestellungen mit Geschenkguthaben sind davon nicht betroffen.
+- Der Kauf weiterer Gutscheine mit Gutscheinguthaben ist aus Missbrauchsschutz ausgeschlossen. Normale Rabattcodes dürfen den Verkauf eines neuen Geschenkgutscheins nicht verbilligen. Auch feste Warenkorb-Rabattcodes wirken nur auf rabattfähige normale Waren, niemals auf den Gutschein-Nennwert.
 - Mehrfache Verwendung bis zur vollständigen Aufbrauchung, mit Transaktionsprotokoll.
 - Gutschein erst bei bezahltem Auftrag aktiv, Code per 96-Bit-Zufall, HMAC-Suchindex, AES-256-GCM verschlüsselt in der Datenbank.
 - Atomares Reservieren per InnoDB-Transaktion, Gutschrift bei Stornierung/Fehlschlag/Vollerstattung.
@@ -45,13 +55,13 @@ Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit mode
 - HPOS-kompatible WooCommerce-Bestell-API; WooCommerce-Standardfunktionen für Produkte/Bestellungen.
 - Kaufgutscheine: Laufzeit standardmäßig bis zum Ende des dritten Folgekalenderjahrs (§ 195, § 199 BGB), ausgehend vom Ausgabejahr. Individuelle rechtliche Einordnung prüfen.
 
-## Geschenkgutscheine ohne Rabatte kaufen (seit v1.7.0)
+## Geschenkgutscheine zum vollen Nennwert verkaufen (seit v1.8.0)
 
-- **Verbindliche Kaufregel:** Der Kauf eines neuen Alowidat-Geschenkgutscheins ist **nicht mit Rabattcodes oder anderen Warenkorb-Preisnachlässen** zulässig. Das gilt für feste und prozentuale WooCommerce-Coupons, für gemischte Warenkörbe mit einem Geschenkgutschein und für automatisch erzeugte negative Rabattgebühren. Wenn ein Coupon bereits aktiv ist, wird das Hinzufügen eines Geschenkgutscheins abgelehnt. Ist bereits ein Geschenkgutschein im Warenkorb, wird das Anwenden eines Rabattcodes abgelehnt. Ein separater Einkauf ist möglich.
-- Mehrstufige Kontrolle: Gutschein-Produktpreis vor der Kalkulation, Coupon-Validierung, Warenkorb-Hinweis, Checkout-Validierung und abschließender Abgleich der Gutscheinnennwerte mit den Bestellpositionen unmittelbar vor dem Speichern. So können rabattierte Gutscheine auch bei alternativen Einlösefeldern nicht unbemerkt verkauft werden.
-- **Unverändert:** Bereits ausgestellte Geschenkgutscheine sind beim normalen Produkteinkauf mit Rabattcodes, Sale-Preisen und Aktionen kombinierbar. Bei gemischten Warenkörben wird eine negative Zahlungsgutschrift für andere Waren (kein Rabatt) weiterhin als solche erkannt; der Kauf des neuen Geschenkgutscheins muss seinen vollen Nennwert haben.
-- **„Wichtige Hinweise“ im Backend selbst bearbeiten:** WooCommerce → Geschenkgutscheine → Einstellungen & Shortcodes → *Wichtige Hinweise auf der Gutscheinseite*. Der Text erscheint auf der Kaufseite und beim Gutschein-Kauf im klassischen Checkout. Leeres Feld blendet nur die Beschreibung aus, **nicht** die technische Rabattsperre. Der separate gesetzliche Widerrufshinweis bleibt bestehen.
-- Bei fremden dynamischen Preis-/Rabattplugins, individuellen Gebühren und Zahlungs-Plugins muss eine zusätzliche End-to-End-Testbestellung sicherstellen, dass kein Preisnachlass auf Gutscheine erfolgt. Das Plugin blockiert Rabattcoupons, negative Rabattgebühren und fehlerhafte Gutscheinsummen bei der Standardbestellerstellung.
+- Gutscheine werden immer zum vollen Nennwert verkauft, **gleichzeitig dürfen Rabattcodes auf andere berechtigte Waren im selben Warenkorb angewendet werden**.
+- Geschenkgutscheine werden vor der Berechnung von Prozent-, Produkt- und festen Warenkorbrabatten aus der Rabattberechnungsmenge ausgeschlossen. Zusätzlich wird vor Bestellerstellung geprüft, dass Gutscheinpreis und Nennwert übereinstimmen.
+- Ausschließlich Gutscheine und kostenlose Gratisproben berechtigen nicht zum Einlösen normaler Rabattcodes. Nicht produktbezogene negative Gebühren aus Drittanbieter-Promotionen bleiben vorsorglich gesperrt, sobald Geschenkgutscheine im Warenkorb liegen. Dafür wäre eine separate Produktzuordnung nötig.
+- **Wichtige Hinweise** lassen sich im Backend selbst bearbeiten. Auf Kaufseite und Kasse ist nur ein gemeinsames Hinweisfeld sichtbar; die gesetzliche Widerrufsinformation bleibt darin enthalten, selbst wenn der individuelle Zusatztext leer ist.
+- Bereits ausgestellte Geschenkgutscheine bleiben weiterhin mit normalen Rabattcodes, Sale-Produkten und Aktionen kombinierbar; Einlösung ist keine neue Warenrabattierung.
 
 ## Beide Gutscheinfelder verwenden (seit v1.6.0)
 

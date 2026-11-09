@@ -251,7 +251,7 @@ final class ALW_Gift_Admin {
             <h3>Wichtige Hinweise auf der Gutscheinseite</h3>
             <label for="alw-important-notice">Hinweistext (manuell bearbeiten)</label>
             <textarea id="alw-important-notice" name="important_notice" rows="5" maxlength="1500" style="width:100%;max-width:760px" placeholder="Hinweistext für die Gutscheinseite …"><?php echo esc_textarea( $s['important_notice'] ); ?></textarea>
-            <p class="description">Der Text wird unter „Wichtige Hinweise“ auf der Kaufseite und bei Gutscheinkäufen an der Kasse angezeigt. Zeilenumbrüche bleiben erhalten. Leer lassen, um das Feld auszublenden. <strong>Wichtig:</strong> Die technische Rabattsperre ist immer aktiv und wird durch Änderungen am Hinweistext nicht deaktiviert. Der gesetzliche Widerrufshinweis bleibt separat erhalten.</p>
+            <p class="description">Der Text steht auf der Kaufseite und bei Gutscheinkäufen an der Kasse zusammen mit dem gesetzlichen Widerrufshinweis in <strong>einem einzigen Hinweisfeld</strong>. Zeilenumbrüche bleiben erhalten. Leer lassen blendet nur den selbst verfassten Zusatztext aus; der gesetzliche Hinweis bleibt sichtbar. Rabattcodes können beim Kauf weiterer normaler Produkte verwendet werden, nie zur Preisreduzierung des Geschenkgutscheins.</p>
             <p><button class="button button-primary" type="submit">Einstellungen speichern</button></p>
         </form></div>
         <div class="alw-gc-admin-panel"><h2>Shortcodes</h2><p>Erstelle eine WordPress-Seite und füge die folgenden Shortcodes in einen Shortcode-Block oder in Elementor ein.</p>

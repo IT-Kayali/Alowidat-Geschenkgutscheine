@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.0 — 2026-11-09
+- **Gemischter Warenkorb:** WooCommerce-Rabattcodes für andere berechtigte Waren weiterhin zulässig, Geschenkgutscheine sind grundsätzlich aus der Rabattberechnung ausgeschlossen. Das löst die bislang pauschale Sperre aus v1.7.0 ab.
+- Bei Prozent-, Festbetrags- und festen Warenkorbrabatten filtert `woocommerce_coupon_get_items_to_apply` Gutscheinpositionen vor der Rabattberechnung heraus; `woocommerce_coupon_get_discount_amount` dient als zusätzliche Sicherung und Fallback für ältere WooCommerce-Versionen.
+- Sicherungen beim Hinzufügen, an der Kasse und bei der Bestellerstellung überprüfen weiter den vollständigen Gutschein-Nennwert. In reinen Gutschein-/Gratisprodukt-Warenkörben gibt es keinen rabattfähigen Artikel.
+- Der bisherige Standard-Hinweistext wird passend zur neuen Warenkorbregel aktualisiert, ohne individuell bearbeitete Hinweise zu überschreiben.
+- **Ein Hinweisfeld:** Der frei bearbeitbare Text „Wichtige Hinweise“ und die unveränderbare gesetzliche Widerrufsinformation erscheinen gemeinsam in einer Box, auf der Kaufseite und bei Gutscheinkäufen an der Kasse. Bestehende Texteinstellungen bleiben erhalten.
+- Nicht zuordenbare negative Rabattgebühren von Drittplugins werden weiterhin vorsorglich blockiert, solange Gutscheine im Warenkorb sind; sie benötigen eine produktbezogene Integration.
+- Keine Änderungen an Guthaben, Datenbankschema, Gratisprodukt-Plugin oder bestehenden Karten; Regressionstests für gemischte Warenkörbe ergänzt.
+
 ## 1.7.0 — 2026-11-09
 - Kauf neuer digitaler Geschenkgutscheine mit WooCommerce-Rabattcodes (alle Coupontypen) oder negativen Rabattgebühren konsequent gesperrt, auch bei gemischten Warenkörben. Bereits aktive Coupons verhindern das Hinzufügen eines neuen Gutscheins und umgekehrt.
 - Mehrfache Sicherheitsprüfung bis unmittelbar vor der Bestellerstellung stellt sicher, dass Gutscheinpositionen ausschließlich zum vollen Nennwert verkauft werden.
