@@ -7,7 +7,8 @@ final class ALW_Gift_Cards {
     public static function settings() {
         return wp_parse_args( get_option( 'alw_gc_settings', array() ), array(
             'amounts' => '25,50,100', 'minimum' => 20, 'maximum' => 500,
-            'gold' => '#d4b45c', 'dark' => '#212121', 'auto_redeem_field' => 'yes', 
+            'gold' => '#d4b45c', 'dark' => '#212121', 'auto_redeem_field' => 'yes',
+            'important_notice' => "Geschenkgutscheine können nicht mit Rabattcodes oder anderen Preisnachlässen gekauft werden.\nBereits vorhandene Geschenkgutscheine können beim Einkauf regulärer Produkte mit Rabattaktionen kombiniert werden.", 
         ) );
     }
 
@@ -43,7 +44,7 @@ final class ALW_Gift_Cards {
         add_action( 'wp_ajax_nopriv_woocommerce_apply_coupon', array( __CLASS__, 'intercept_native_ajax_coupon' ), 1 );
         add_filter( 'woocommerce_add_to_cart_validation', array( __CLASS__, 'protect_product' ), 10, 3 );
         add_filter( 'woocommerce_get_cart_item_from_session', array( __CLASS__, 'restore_cart_item' ), 20, 2 );
-        add_action( 'woocommerce_before_calculate_totals', array( __CLASS__, 'set_prices' ), 20 );
+        add_action( 'woocommerce_before_calculate_totals', array( __CLASS__, 'set_prices' ), 9999 );
         // Digitale Geschenkgutscheine dürfen niemals Versandbedarf verursachen.
         add_filter( 'woocommerce_product_needs_shipping', array( __CLASS__, 'gift_needs_no_shipping' ), 20, 2 );
         add_filter( 'woocommerce_get_item_data', array( __CLASS__, 'cart_item_display' ), 20, 2 );
@@ -51,6 +52,9 @@ final class ALW_Gift_Cards {
         add_filter( 'woocommerce_update_cart_validation', array( __CLASS__, 'validate_cart_quantity' ), 10, 4 );
         add_filter( 'woocommerce_coupon_is_valid_for_product', array( __CLASS__, 'exclude_gift_purchase_from_discounts' ), 20, 4 );
         add_filter( 'woocommerce_coupon_is_valid', array( __CLASS__, 'protect_gift_purchase_from_fixed_cart_coupons' ), 20, 2 );
+        add_action( 'woocommerce_check_cart_items', array( __CLASS__, 'validate_no_discount_purchase' ), 30 );
+        add_action( 'woocommerce_after_checkout_validation', array( __CLASS__, 'checkout_discount_validation' ), 30, 2 );
+        add_action( 'woocommerce_checkout_create_order', array( __CLASS__, 'validate_gift_order_amounts' ), PHP_INT_MAX, 2 );
         add_action( 'woocommerce_checkout_create_order_line_item', array( __CLASS__, 'order_item_meta' ), 20, 4 );
         add_action( 'woocommerce_review_order_before_submit', array( __CLASS__, 'checkout_purchase_policy' ), 15 );
         add_filter( 'woocommerce_calculated_total', array( __CLASS__, 'apply_credit_to_total' ), 999, 2 );
@@ -186,7 +190,8 @@ final class ALW_Gift_Cards {
                         <div class="alw-gc-field"><label for="alw-gc-message">Persönliche Nachricht <small>(optional)</small></label><textarea id="alw-gc-message" name="alw_gc_message" maxlength="500" rows="3" placeholder="Ich wünsche dir viel Freude beim Entdecken deines Lieblingsdufts!"></textarea></div>
                     </div>
                     <button class="alw-gc-primary" type="submit"><span>Jetzt Gutschein kaufen</span><span class="alw-gc-button-value"><?php echo esc_html( $amounts[0] ?? 25 ); ?> €</span></button>
-                    <p class="alw-gc-help">✦ Digitaler Versand nach Zahlung · Nur online bei Alowidat einlösbar · Auch mit einem anderen Kundenkonto oder als Gast nutzbar · Restguthaben bleibt erhalten · Mit Rabattaktionen kombinierbar</p>
+                    <p class="alw-gc-help">✦ Digitaler Versand nach Zahlung · Nur online bei Alowidat einlösbar · Auch mit einem anderen Kundenkonto oder als Gast nutzbar · Restguthaben bleibt erhalten · Beim Einlösen mit Rabattaktionen kombinierbar</p>
+                    <?php echo self::important_notice_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Text beim Rendern escaped. ?>
                     <?php echo self::purchase_policy_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Statisches, kontrolliertes HTML. ?>
                 </form>
             </div>
@@ -211,11 +216,22 @@ final class ALW_Gift_Cards {
             . '</aside>';
     }
 
+    /** Frei bearbeitbare Hinweise zum Gutscheinkauf, ohne HTML aus dem Backend auszuführen. */
+    private static function important_notice_html( $checkout = false ) {
+        $settings = self::settings();
+        $notice = trim( (string) ( $settings['important_notice'] ?? '' ) );
+        if ( '' === $notice ) { return ''; }
+        $extra = $checkout ? ' alw-gc-important-notice-checkout' : '';
+        return '<aside class="alw-gc-important-notice' . $extra . '" aria-label="Wichtige Hinweise zum Geschenkgutschein">'
+            . '<strong>Wichtige Hinweise</strong><p>' . nl2br( esc_html( $notice ) ) . '</p></aside>';
+    }
+
     /** Zeigt den Hinweis erneut, aber nur wenn Gutscheine gekauft werden. */
     public static function checkout_purchase_policy() {
         if ( ! function_exists( 'WC' ) || ! WC()->cart ) { return; }
         foreach ( WC()->cart->get_cart() as $item ) {
             if ( self::is_gift_product( $item['product_id'] ?? 0 ) ) {
+                echo wp_kses_post( self::important_notice_html( true ) );
                 echo wp_kses_post( self::purchase_policy_html( true ) );
                 return;
             }
@@ -418,6 +434,11 @@ final class ALW_Gift_Cards {
         $target = sanitize_key( wp_unslash( $_POST['alw_gc_target'] ?? 'self' ) );
         $email = 'friend' === $target ? sanitize_email( wp_unslash( $_POST['alw_gc_recipient_email'] ?? '' ) ) : '';
         if ( 'friend' === $target && ! is_email( $email ) ) { wc_add_notice( 'Bitte eine gültige Empfänger-E-Mail-Adresse angeben.', 'error' ); return; }
+        // Keine Gutschein-Käufe in einem Warenkorb mit bereits aktivierten Rabattcodes.
+        if ( self::cart_has_coupons( WC()->cart ) ) {
+            wc_add_notice( self::purchase_discount_message(), 'error' );
+            return;
+        }
         $product_id = self::gift_product_id();
         if ( ! $product_id || ! wc_get_product( $product_id ) ) { wc_add_notice( 'Das Gutscheinprodukt ist nicht verfügbar.', 'error' ); return; }
         $data = array(
@@ -439,6 +460,10 @@ final class ALW_Gift_Cards {
     }
 
     public static function protect_product( $valid, $product_id, $quantity ) {
+        if ( self::is_gift_product( $product_id ) && function_exists( 'WC' ) && WC()->cart && self::cart_has_coupons( WC()->cart ) ) {
+            wc_add_notice( self::purchase_discount_message(), 'error' );
+            return false;
+        }
         if ( self::is_gift_product( $product_id ) && ! self::$allow_add ) {
             wc_add_notice( 'Bitte verwende die Alowidat Gutscheinseite zum Kauf.', 'error' );
             return false;
@@ -492,20 +517,94 @@ final class ALW_Gift_Cards {
         return self::is_gift_product( $product->get_id() ) ? false : $valid;
     }
 
-    /**
-     * Feste Warenkorb-Rabatte werden von WooCommerce nicht bei allen Varianten
-     * pro Produkt gefiltert. Beim Verkauf neuer Gutscheine deshalb schützen.
-     * Das ist unabhängig von der Einlösung vorhandenen Geschenkguthabens.
-     */
+    /** Fest definierte Regel: Gutscheinkäufe dürfen durch keinen Rabattcode günstiger werden. */
+    private static function purchase_discount_message() {
+        return 'Geschenkgutscheine können nicht mit Rabattcodes gekauft werden. Bitte den Rabattcode entfernen oder den Geschenkgutschein separat bestellen.';
+    }
+
+    private static function cart_has_gift_purchase( $cart ) {
+        if ( ! $cart || ! method_exists( $cart, 'get_cart' ) ) { return false; }
+        foreach ( $cart->get_cart() as $item ) {
+            if ( self::is_gift_product( $item['product_id'] ?? 0 ) ) { return true; }
+        }
+        return false;
+    }
+
+    private static function cart_has_coupons( $cart ) {
+        return $cart && method_exists( $cart, 'get_applied_coupons' ) && (bool) $cart->get_applied_coupons();
+    }
+
+    private static function cart_has_negative_discount_fee( $cart ) {
+        if ( ! $cart || ! method_exists( $cart, 'get_fees' ) ) { return false; }
+        foreach ( $cart->get_fees() as $fee ) {
+            if ( (float) ( $fee->amount ?? 0 ) < -0.00001 ) { return true; }
+        }
+        return false;
+    }
+
+    private static function cart_gift_price_modified( $cart ) {
+        if ( ! $cart || ! method_exists( $cart, 'get_cart' ) ) { return false; }
+        foreach ( $cart->get_cart() as $item ) {
+            if ( ! self::is_gift_product( $item['product_id'] ?? 0 ) ) { continue; }
+            $cents = (int) ( $item['alw_gc_amount_cents'] ?? 0 );
+            if ( $cents < 1 || (int) ( $item['quantity'] ?? 0 ) !== 1 ) { return true; }
+            if ( ! isset( $item['data'] ) || ! method_exists( $item['data'], 'get_price' ) || self::cents( $item['data']->get_price() ) !== $cents ) { return true; }
+            // subtotal und total werden erst nach WooCommerce calculate_totals bereitgestellt.
+            if ( isset( $item['line_subtotal'] ) && self::cents( $item['line_subtotal'] ) !== $cents ) { return true; }
+            if ( isset( $item['line_total'] ) && self::cents( $item['line_total'] ) !== $cents ) { return true; }
+        }
+        return false;
+    }
+
+    /** Der bisherige Hook-Name bleibt aus Kompatibilitätsgründen erhalten. */
     public static function protect_gift_purchase_from_fixed_cart_coupons( $valid, $coupon ) {
-        if ( ! $valid || ! $coupon || 'fixed_cart' !== $coupon->get_discount_type() ) { return $valid; }
-        if ( ! function_exists( 'WC' ) || ! WC()->cart ) { return $valid; }
-        foreach ( WC()->cart->get_cart() as $item ) {
-            if ( self::is_gift_product( $item['product_id'] ?? 0 ) ) {
-                throw new Exception( 'Ein fester Warenkorb-Rabattcode kann nicht beim Kauf eines neuen Geschenkgutscheins verwendet werden. Bitte den Gutschein separat bestellen.' );
-            }
+        if ( ! $valid || ! function_exists( 'WC' ) || ! WC()->cart ) { return $valid; }
+        if ( self::cart_has_gift_purchase( WC()->cart ) ) {
+            throw new Exception( self::purchase_discount_message() );
         }
         return $valid;
+    }
+
+    /** Prüfung für klassische Warenkorb-/Checkout-Seiten und Drittanbieter, die Coupons setzen. */
+    public static function validate_no_discount_purchase() {
+        if ( ! function_exists( 'WC' ) || ! WC()->cart || ! self::cart_has_gift_purchase( WC()->cart ) ) { return; }
+        if ( self::cart_has_coupons( WC()->cart ) || self::cart_has_negative_discount_fee( WC()->cart ) ) {
+            wc_add_notice( self::purchase_discount_message(), 'error' );
+        } elseif ( self::cart_gift_price_modified( WC()->cart ) ) {
+            wc_add_notice( 'Der Geschenkgutschein muss zum vollen Nennwert gekauft werden. Bitte den Warenkorb aktualisieren.', 'error' );
+        }
+    }
+
+    /** Zusätzliche serverseitige Checkout-Sperre, unabhängig von WooCommerce Notices. */
+    public static function checkout_discount_validation( $data, $errors ) {
+        if ( ! function_exists( 'WC' ) || ! WC()->cart || ! self::cart_has_gift_purchase( WC()->cart ) ) { return; }
+        if ( self::cart_has_coupons( WC()->cart ) || self::cart_has_negative_discount_fee( WC()->cart ) ) {
+            $errors->add( 'alw_gc_discount_purchase', self::purchase_discount_message() );
+        } elseif ( self::cart_gift_price_modified( WC()->cart ) ) {
+            $errors->add( 'alw_gc_modified_price', 'Der Geschenkgutschein darf nur zum vollen Nennwert gekauft werden.' );
+        }
+    }
+
+    /** Letzte Sicherheitsprüfung vor dem Speichern/Bezahlen einer Bestellung. */
+    public static function validate_gift_order_amounts( $order, $data ) {
+        $gift_found = false;
+        foreach ( $order->get_items( 'line_item' ) as $item ) {
+            if ( ! self::is_gift_product( $item->get_product_id() ) ) { continue; }
+            $gift_found = true;
+            $cents = (int) $item->get_meta( '_alw_gc_amount_cents', true );
+            if ( $cents < 1 || (int) $item->get_quantity() !== 1 || self::cents( $item->get_total() ) !== $cents || self::cents( $item->get_subtotal() ) !== $cents ) {
+                throw new Exception( 'Geschenkgutscheine müssen zum vollen Nennwert gekauft werden. Bitte den Warenkorb überprüfen.' );
+            }
+        }
+        if ( ! $gift_found ) { return; }
+        if ( $order->get_coupon_codes() ) { throw new Exception( self::purchase_discount_message() ); }
+        foreach ( $order->get_items( 'fee' ) as $fee ) {
+            // Bereits vorhandenes Guthaben für andere Waren bleibt eine Zahlung, kein Rabatt.
+            if ( 'yes' === $fee->get_meta( '_alw_gc_payment', true ) ) { continue; }
+            if ( (float) $fee->get_total() < -0.00001 ) {
+                throw new Exception( 'Ein Gutschein-Kauf kann nicht zusammen mit einem Preisnachlass abgeschlossen werden.' );
+            }
+        }
     }
 
     public static function order_item_meta( $order_item, $cart_item_key, $values, $order ) {

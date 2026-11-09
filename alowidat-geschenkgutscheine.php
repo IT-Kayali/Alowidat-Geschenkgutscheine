@@ -3,7 +3,7 @@
  * Plugin Name: Alowidat Geschenkgutscheine
  * Plugin URI: https://alowidat.de/
  * Description: Digitale Geschenkgutscheine für WooCommerce mit Shortcodes, Restguthaben, steuerneutraler Guthabenanrechnung und Verwaltung.
- * Version: 1.6.0
+ * Version: 1.7.0
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * WC requires at least: 8.4
@@ -13,7 +13,7 @@
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-define( 'ALW_GC_VERSION', '1.6.0' );
+define( 'ALW_GC_VERSION', '1.7.0' );
 define( 'ALW_GC_FILE', __FILE__ );
 define( 'ALW_GC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ALW_GC_URL', plugin_dir_url( __FILE__ ) );

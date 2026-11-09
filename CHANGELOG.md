@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0 — 2026-11-09
+- Kauf neuer digitaler Geschenkgutscheine mit WooCommerce-Rabattcodes (alle Coupontypen) oder negativen Rabattgebühren konsequent gesperrt, auch bei gemischten Warenkörben. Bereits aktive Coupons verhindern das Hinzufügen eines neuen Gutscheins und umgekehrt.
+- Mehrfache Sicherheitsprüfung bis unmittelbar vor der Bestellerstellung stellt sicher, dass Gutscheinpositionen ausschließlich zum vollen Nennwert verkauft werden.
+- Neue frei bearbeitbare Einstellung **„Wichtige Hinweise“** unter WooCommerce → Geschenkgutscheine → Einstellungen & Shortcodes. Sicher escaped und auf Gutschein-Kaufseite sowie im klassischen Checkout sichtbar; leerer Text blendet nur den Hinweis aus.
+- Die Rabattsperre ist eine feste Funktion und kann nicht durch eine Textänderung deaktiviert werden; gesetzlicher Widerrufshinweis bleibt separat erhalten.
+- Die Einlösung bereits ausgestellten Geschenkguthabens bei normalen Waren bleibt weiterhin mit Rabattcodes, Sonderangeboten und Sale-Artikeln kombinierbar. Bestehende Karten, Guthaben und das Gratisprodukt-Plugin sind unverändert.
+- Neue Regressionstests für alle Coupontypen, Checkoutsperre, geänderte Gutscheinpreise, automatische negative Gebühren, Anzeigesicherheit und Ausnahmen für normale Produkte.
+
 ## 1.6.0 — 2026-11-08
 - Bidirektionale Gutscheineinlösung: Alowidat-Geschenkguthaben nun auch über das reguläre WooCommerce-Rabattcodefeld im klassischen Warenkorb und in der klassischen Kasse. Bestehende WooCommerce-Coupons funktionieren weiterhin im Alowidat-Einlösefeld.
 - Sichere Prüfung der nativen WooCommerce-Form- und AJAX-Nonces; Gutscheinguthaben wird nicht als Warenrabatt verarbeitet, sondern wie bisher nach Steuern und regulären Rabatten angerechnet.

@@ -45,6 +45,10 @@ jobs:
             php tests/test-native-coupons.php "$scenario"
           done
 
+      - name: Gutscheinkauf ohne Rabatte und bearbeitbare Hinweise prüfen
+        shell: bash
+        run: php tests/test-purchase-discounts.php
+
       - name: ZIP als GitHub Release veröffentlichen
         shell: bash
         env:
@@ -55,8 +59,6 @@ jobs:
           tag="v${version}"
           file="dist/alowidat-geschenkgutscheine-v${version}.zip"
 
-          # Eine Versionsnummer bezeichnet genau einen unveränderlichen Release.
-          # So entsteht kein unbemerkt abweichender Code unter derselben ZIP-Version.
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "::error::Release ${tag} existiert bereits. Für Codeänderungen zuerst die Plugin-Versionsnummer, README und CHANGELOG erhöhen."
             exit 1

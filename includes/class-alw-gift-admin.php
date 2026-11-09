@@ -66,6 +66,8 @@ final class ALW_Gift_Admin {
             $old['gold'] = sanitize_hex_color( wp_unslash( $_POST['gold'] ?? '' ) ) ?: '#d4b45c';
             $old['dark'] = sanitize_hex_color( wp_unslash( $_POST['dark'] ?? '' ) ) ?: '#212121';
             $old['auto_redeem_field'] = isset( $_POST['auto_redeem_field'] ) ? 'yes' : 'no';
+            $notice = isset( $_POST['important_notice'] ) && is_string( $_POST['important_notice'] ) ? sanitize_textarea_field( wp_unslash( $_POST['important_notice'] ) ) : '';
+            $old['important_notice'] = function_exists( 'mb_substr' ) ? mb_substr( $notice, 0, 1500 ) : substr( $notice, 0, 1500 );
             update_option( 'alw_gc_settings', $old, false );
             update_option( 'alw_gc_purchase_page_id', absint( $_POST['purchase_page_id'] ?? 0 ), false );
             $redirect = add_query_arg( array( 'tab' => 'settings', 'alw_notice' => 'saved' ), $redirect );
@@ -245,6 +247,11 @@ final class ALW_Gift_Admin {
             <p class="description">Auf dieser Seite muss der Shortcode [alowidat_gutscheine] eingebunden sein. Der Link wird im Kundenkonto verwendet.</p>
             <p><label for="alw-auto-redeem"><input type="checkbox" id="alw-auto-redeem" name="auto_redeem_field" value="yes" <?php checked( 'yes', $s['auto_redeem_field'] ); ?>> Zusätzliches Alowidat-Gutschein-/Rabattfeld automatisch im Warenkorb und an der Kasse anzeigen</label></p>
             <p class="description">Deaktivieren: Sofern WooCommerce-Rabattcodes unter WooCommerce → Einstellungen → Allgemein aktiviert sind, bleiben die normalen WooCommerce-Gutscheinfelder sichtbar und akzeptieren weiterhin Alowidat-Geschenkguthaben sowie Rabattcodes. Auch ein angewendeter Geschenkgutschein kann in der Bestellsumme entfernt werden. Der Shortcode [alowidat_gutschein_einloesen] bleibt auf Wunsch manuell nutzbar.</p>
+            <hr>
+            <h3>Wichtige Hinweise auf der Gutscheinseite</h3>
+            <label for="alw-important-notice">Hinweistext (manuell bearbeiten)</label>
+            <textarea id="alw-important-notice" name="important_notice" rows="5" maxlength="1500" style="width:100%;max-width:760px" placeholder="Hinweistext für die Gutscheinseite …"><?php echo esc_textarea( $s['important_notice'] ); ?></textarea>
+            <p class="description">Der Text wird unter „Wichtige Hinweise“ auf der Kaufseite und bei Gutscheinkäufen an der Kasse angezeigt. Zeilenumbrüche bleiben erhalten. Leer lassen, um das Feld auszublenden. <strong>Wichtig:</strong> Die technische Rabattsperre ist immer aktiv und wird durch Änderungen am Hinweistext nicht deaktiviert. Der gesetzliche Widerrufshinweis bleibt separat erhalten.</p>
             <p><button class="button button-primary" type="submit">Einstellungen speichern</button></p>
         </form></div>
         <div class="alw-gc-admin-panel"><h2>Shortcodes</h2><p>Erstelle eine WordPress-Seite und füge die folgenden Shortcodes in einen Shortcode-Block oder in Elementor ein.</p>

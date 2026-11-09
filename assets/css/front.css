@@ -97,3 +97,9 @@
 @media(max-width:650px){.alw-gc-redeem .alw-gc-redeem-tools{width:100%;min-width:0}.alw-gc-applied-code{flex-wrap:wrap}}
 /* 1.6.0: Guthaben im offiziellen WooCommerce-Summenbereich entfernen. */
 .alw-gc-credit-row .alw-gc-remove-credit{font-weight:500;font-size:12px;margin-left:9px;text-decoration:underline;color:var(--alw-gc-dark,#212121);white-space:nowrap}
+
+/* v1.7.0 – einstellbare Wichtige Hinweise im Alowidat-Stil */
+.alw-gc-important-notice{--alw-ink:var(--alw-gc-dark,#212121);--alw-gold:var(--alw-gc-gold,#d4b45c);margin:17px 0 0;padding:16px 18px;border:1px solid #e9dfcb;border-left:3px solid var(--alw-gold);border-radius:8px;background:#fffdfa;color:#554d41;font-family:inherit;font-size:13px;line-height:1.65}
+.alw-gc-important-notice strong{display:block;margin-bottom:7px;color:var(--alw-ink);font-weight:700;font-size:14px}
+.alw-gc-important-notice p{margin:0!important;color:inherit!important;font-size:13px!important;line-height:1.7!important;overflow-wrap:anywhere}
+.alw-gc-important-notice-checkout{margin:12px 0 16px}
