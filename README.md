@@ -2,7 +2,7 @@
 
 Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit moderner Formularoberfläche, Empfänger-E-Mail, personalisierter Grußbotschaft, Restguthaben, Admin-Verwaltung und Steuer-neutraler Guthabenanrechnung.
 
-**Version:** 1.7.0 · **Sprache:** Deutsch · **Währung:** EUR · **WordPress:** ab 6.4 · **PHP:** ab 7.4 mit OpenSSL · **WooCommerce:** ab 8.4
+**Version:** 1.8.0 · **Sprache:** Deutsch · **Währung:** EUR · **WordPress:** ab 6.4 · **PHP:** ab 7.4 mit OpenSSL · **WooCommerce:** ab 8.4
 
 ## Gutscheinrabatte im gemischten Warenkorb (seit v1.8.0)
 
@@ -16,7 +16,7 @@ Eigenständiges WooCommerce-Plugin für **digitale Geschenkgutscheine** mit mode
 
 ## Installation
 
-1. Die ZIP `alowidat-geschenkgutscheine-v1.6.0.zip` unter **WordPress → Plugins → Plugin hochladen** installieren und aktivieren.
+1. Die ZIP `alowidat-geschenkgutscheine-v1.8.0.zip` unter **WordPress → Plugins → Plugin hochladen** installieren und aktivieren.
 2. WooCommerce muss aktiviert sein; die Shopwährung muss auf **EUR** stehen.
 3. Unter **WooCommerce → Geschenkgutscheine → Einstellungen & Shortcodes** Werte, Mindest-/Höchstbetrag und Farben konfigurieren. Wenn du den Höchstbetrag entfernst und speicherst, steht auf der Gutscheinseite nur „Ab 20 €“.
 4. Eine Seite „Geschenkgutscheine“ erstellen und den Shortcode `[alowidat_gutscheine]` (Elementor-Shortcode-Widget oder WP-Shortcode-Block) einfügen.
